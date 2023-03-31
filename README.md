@@ -24,14 +24,17 @@ env/ymlexample下的配置并做对应修改<br>
  并修改子项目resources目录下的registry.conf里的nacos相关配置，**seata.conf中的transaction.service.group必须和seata namespace中的service.vgroupMapping.xxx一致**<br>
  
 ### 使用
- 项目内写了几个保存和查询方法，用来测试分库和分表，其中savePayment方法应用了分布式事务，可修改代码手动抛出异常<br>
+ 项目内写了几个保存和查询方法，用来测试分库和分表，其中tb_pay和tb_pay_detail做了绑定表<br>
+ savePayment方法应用了分布式事务，可修改代码手动抛出异常<br>
  分布式事务生效的条件为方法同时加@Transactional和@ShardingSphereTransactionType(value = TransactionType.BASE)<br>
- 加@ShardingSphereTransactionType的作用就是改变当前事务的类型为BASE,才会以分布式事务的方式执行方法
+ 加@ShardingSphereTransactionType的作用就是改变当前事务的类型为BASE,transactionManager应用为SeataATShardingSphereTransactionManager
 ### 结语
+ 此demo的改法参考了issue#22356 @huangxiuqi推荐的代码<br>
  在整合过程中遇到过许许多多的问题，比如一开始使用的是<br>
  sharding-jdbc-spring-boot-starter:4.1.1
-开始我以为是版本不对，改用shardingsphere的依赖<br>
-yml配置和shardingsphere-jdbc-core-spring-boot-starter:5.2.0的大不相同<br>
+ 开始我以为是版本不对，改用shardingsphere的依赖<br>
+ yml配置和shardingsphere-jdbc-core-spring-boot-starter:5.2.0的大不相同<br>
+
 其次就是与seata整合的方式，网上也是cv大法一大堆，照着一圈整下来就是图个乐，甚至连shardingsphere apache官网给的整合地址也是一个社区的回答，而且是21年的，相当无语。<br>
 当你失望到去翻shardingsphere源码的时候，决定搞清楚到底为什么分支没有接入全局事务的时候你就会对分布式事务以及如何整合到shardingsphere有更清晰的认知<br>
 
@@ -63,9 +66,7 @@ yml配置和shardingsphere-jdbc-core-spring-boot-starter:5.2.0的大不相同<br
     ]
 }
 ```
-storage提前整几条数据进去，然后整个方法耗时平均在2秒+，不加分布式事务整体耗时平均300ms+<br>
-可能是种种原因导致的，也可能如官网blog所说：<br>
-***待优化项<br>
-Seata AT事务在Revert SQL时，需要对ShardingSphere分片后的物理SQL进行二次的解析，这里我们需要设计一个SPI，避免SQL二次解析的性能损耗。***
+storage提前整几条数据进去，然后整个方法耗时平均在2秒+，不加分布式事务整体耗时平均400ms+<br>
+慢可能是种种原因导致的，也可能是待优化项<br>
 
 demo的不足之处请谅解，欢迎交流沟通!
