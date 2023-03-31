@@ -1,0 +1,2 @@
+截止2023-03-29，shardingsphere-transaction-base-seata-at:5.3.1中SeataTransactionHolder仍然是package访问修饰符
+以下两个jar里的SeataTransactionHolder类和方法已改为public，用于替换本地m2里的jar

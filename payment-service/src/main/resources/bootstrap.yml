@@ -1,0 +1,31 @@
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: @project.name@
+  profiles:
+    active: @shardingJdbc.profiles.active@
+  cloud:
+    nacos:
+      username: @nacos.username@
+      password: @nacos.password@
+      discovery:
+        namespace: @nacos.namespace@
+        server-addr: @nacos.ip@:@nacos.port@  #nacos服务地址
+      config:
+        namespace: @nacos.namespace@  #我们在nacos中创建的空间名称
+        timeout: 3000
+        file-extension: yml  #读取nacos配置文件后缀
+        enable-remote-sync-config: true
+        refresh-enabled: true
+        server-addr: @nacos.ip@:@nacos.port@  #nacos服务地址
+        shared-configs:
+          - data-id: db.yml
+            refresh: true
+          - data-id: common.yml
+            refresh: true
+          - data-id: seata-config.yml
+            refresh: false
+
+
+

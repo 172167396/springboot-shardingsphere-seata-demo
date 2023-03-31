@@ -1,0 +1,10 @@
+db1:
+  ip: 127.0.0.1
+  username: root
+  passwd: 123456
+  schema: db_payment0
+db2:
+  ip: 127.0.0.1
+  username: root
+  passwd: 123456
+  schema: db_payment1

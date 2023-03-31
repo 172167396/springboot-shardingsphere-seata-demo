@@ -1,0 +1,24 @@
+logging:
+  level:
+    root: info
+    com.shard.springbootshardingjdbc: debug
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+
+mode:
+  type: Standalone
+  repository:
+    type: JDBC
+  overwrite: false
+
+feign:
+  okhttp:
+    enable: true
+  client:
+    config:
+      #这里填具体的服务名称（也可以填default，表示对所有服务生效）
+      default:
+        #connectTimeout和readTimeout这两个得一起配置才会生效
+        connectTimeout: 600000
+        readTimeout: 600000

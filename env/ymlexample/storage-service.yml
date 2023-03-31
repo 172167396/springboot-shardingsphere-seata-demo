@@ -1,0 +1,86 @@
+algorithm:
+  class-name: com.shard.springbootshardingjdbc.readwrite.algorithm.ConsistentShardingAlgorithm
+server:
+  port: 10088
+spring:
+  shardingsphere:
+    props:
+      sql-show: true
+    datasource:
+      names: ds-0-master,ds-0-follow,ds-1-master,ds-1-follow
+      ds-0-master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${db1.ip}:3306/${db1.schema}?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: ${db1.username}
+        password: ${db1.passwd}
+      ds-0-follow:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${db1.ip}:3307/${db1.schema}?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: ${db1.username}
+        password: ${db1.passwd}
+      ds-1-master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${db2.ip}:3306/${db2.schema}?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: ${db2.username}
+        password: ${db2.passwd}
+      ds-1-follow:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://${db2.ip}:3307/${db2.schema}?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL
+        username: ${db2.username}
+        password: ${db2.passwd}
+    rules:
+      ##这个配置应该没用
+      transaction:
+        defaultType: BASE
+        providerType: Seata
+      readwrite-splitting:
+        load-balancers:
+          ms:
+            type: ROUND_ROBIN
+            props:
+              workId: 1
+        data-sources:
+          ds0:
+            staticStrategy:
+              writeDataSourceName: ds-0-master
+              readDataSourceNames: ds-0-follow
+            load-balancer-name: ms
+          ds1:
+            staticStrategy:
+              writeDataSourceName: ds-1-master
+              readDataSourceNames: ds-1-follow
+            load-balancer-name: ms
+      sharding:
+        key-generators:
+          snowflake:
+            type: SNOWFLAKE
+            props:
+              worker-id: 1
+        sharding-algorithms:
+          db-standard:
+            type: CLASS_BASED
+            props:
+              strategy: STANDARD
+              algorithmClassName: ${algorithm.class-name}
+          table-standard:
+            type: CLASS_BASED
+            props:
+              strategy: STANDARD
+              algorithmClassName: ${algorithm.class-name}
+        bindingTables:
+        # 表策略配置
+        tables:
+          tb_storage:
+            actualDataNodes: ds$->{0..1}.tb_storage$->{0..2}
+            databaseStrategy:
+              standard:
+                sharding-column: id
+                sharding-algorithm-name: db-standard
+            tableStrategy:
+              standard:
+                shardingColumn: id
+                sharding-algorithm-name: table-standard
