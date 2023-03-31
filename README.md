@@ -35,8 +35,6 @@ env/ymlexample下的配置并做对应修改<br>
  开始我以为是版本不对，改用shardingsphere的依赖<br>
  yml配置和shardingsphere-jdbc-core-spring-boot-starter:5.2.0的大不相同<br>
 
-其次就是与seata整合的方式，网上也是cv大法一大堆，照着一圈整下来就是图个乐，甚至连shardingsphere apache官网给的整合地址也是一个社区的回答，而且是21年的，相当无语。<br>
-当你失望到去翻shardingsphere源码的时候，决定搞清楚到底为什么分支没有接入全局事务的时候你就会对分布式事务以及如何整合到shardingsphere有更清晰的认知<br>
 
 申明，由于硬件或软件配置原因，以下结果因人而异<br>
 经过多次接口调用测试，带与不带分布式事务的方法执行耗时相差比较大，以savePayment为例，样例json
